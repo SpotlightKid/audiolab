@@ -1,0 +1,10 @@
+build/
+dist/
+*.pyc
+__pycache__/
+*.egg-info
+audiolab/info.py
+audiolab/version.py
+audiolab/pysndfile/_sndfile.c
+audiolab/soundio/alsa/_alsa_backend.c
+docs/src/audiolab_version.py
