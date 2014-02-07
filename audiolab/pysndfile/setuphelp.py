@@ -3,7 +3,8 @@ from distutils import log
 
 from numpy.distutils.system_info import system_info, NotFoundError, dict_append, so_ext
 
-def info_factory(name, libnames, headers, frameworks=None, 
+
+def info_factory(name, libnames, headers, frameworks=None,
                  section=None, classname=None):
     """Create a system_info class.
 

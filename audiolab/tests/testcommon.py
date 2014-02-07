@@ -1,8 +1,10 @@
 import os
-from tempfile import mkstemp
 import sys
 
+from tempfile import mkstemp
+
 import audiolab
+
 
 TEST_DATA_DIR = os.path.join(os.path.dirname(audiolab.__file__),
                              'test_data')

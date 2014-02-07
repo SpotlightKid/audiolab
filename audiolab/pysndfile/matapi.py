@@ -19,10 +19,13 @@
 """This module implements functions to read and write to audio files easily
 (ala matlab: wavread, etc...)."""
 
+from __future__ import absolute_import
+
 import numpy as np
 
-from _sndfile import Format, Sndfile, available_file_formats, \
-                     available_encodings, sndfile_version
+from ._sndfile import (Format, Sndfile, available_file_formats,
+    available_encodings, sndfile_version)
+
 
 __all__ = []
 _MATAPI_FORMAT = ['wav', 'aiff', 'au', 'sdif', 'flac', 'ogg']
@@ -91,8 +94,8 @@ def _reader_factory(name, filetype, descr):
         hdl = Sndfile(filename, 'r')
         try:
             if not hdl.format.file_format == filetype:
-                raise ValueError, "%s is not a %s file (is %s)" \
-                      % (filename, filetype, hdl.format.file_format)
+                raise ValueError("%s is not a %s file (is %s)"
+                      % (filename, filetype, hdl.format.file_format))
 
             fs = hdl.samplerate
             enc = hdl.encoding
@@ -168,11 +171,11 @@ _AFORMATS = available_file_formats()
 _SNDFILE_VER = sndfile_version()
 def _missing_function(format):
     def foo(*args, **kw):
-        raise NotImplementedError, \
-              "Matlab API for %s is disabled: format %s is not supported by "\
-              "your version of libsndfile (%s)" % (format, 
+        raise NotImplementedError(
+              "Matlab API for %s is disabled: format %s is not supported by "
+              "your version of libsndfile (%s)" % (format,
                                                     format,
-                                                    _SNDFILE_VER)
+                                                    _SNDFILE_VER))
     foo.__doc__ = "This function is not supported with your version " \
                   "of libsndfile."
     return foo

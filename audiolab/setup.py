@@ -1,6 +1,7 @@
 import os
 from os.path import join
 
+
 TEST_DATA_FILES = ['test.raw', 'test.flac', 'test.wav', 'test.au', 'test.sdif']
 #BAD_FLAC_FILES = ['Makefile', 'badflac.flac', 'badflac.c']
 

@@ -30,7 +30,9 @@
 #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """Subpackage to play and record sound using numpy arrays."""
-__all__ = []
 
-from play import play
-__all__ += ["play"]
+from __future__ import absolute_import
+
+from .play import play
+
+__all__ = ["play"]

@@ -19,24 +19,29 @@ Copyright (C) 2006-2007 Cournapeau David <cournape@gmail.com>
 LICENSE: audiolab is licensed under the LGPL, as is libsndfile itself. See
 COPYING.txt for details.  """
 
-from version import version as _version
-__version__ = _version
+from __future__ import absolute_import
 
-from pysndfile import formatinfo, sndfile
-from pysndfile import supported_format, supported_endianness, \
-                      supported_encoding, PyaudioException, \
-                      PyaudioIOError
-from pysndfile import Sndfile, Format, available_file_formats, \
-                      available_encodings, sndfile_version
-__sndfile_version__ = ".".join([str(i) for i in sndfile_version()])
-#from audiolab.matapi import wavread, aiffread, flacread, auread, \
-#        sdifread, wavwrite, aiffwrite, flacwrite, auwrite, sdifwrite
-from pysndfile.matapi import *
+from .version import version as _version
 
-from soundio import play
-__all__ = filter(lambda s:not s.startswith('_'),dir())
+from .pysndfile import formatinfo, sndfile
+from .pysndfile import (supported_format, supported_endianness,
+    supported_encoding, PyaudioException, PyaudioIOError)
+from .pysndfile import (Sndfile, Format, available_file_formats,
+    available_encodings, sndfile_version)
+from .pysndfile.matapi import *
+
+#from audiolab.matapi import (wavread, aiffread, flacread, auread,
+#        sdifread, wavwrite, aiffwrite, flacwrite, auwrite, sdifwrite)
+
+from .soundio import play
 
 from numpy.testing import Tester
 
+
+__version__ = _version
+__sndfile_version__ = ".".join([str(i) for i in sndfile_version()])
+
 test = Tester().test
 bench = Tester().bench
+
+__all__ = [s for s in dir() if not s.startswith('_')]

@@ -1,9 +1,13 @@
+from __future__ import absolute_import
+
 import warnings
 import copy
 
 import numpy as np
 
-from _sndfile import Format, Sndfile, available_file_formats, available_encodings
+from ._sndfile import (Format, Sndfile, available_file_formats,
+    available_encodings)
+
 
 #+++++++++++++++++
 # Public exception
@@ -97,13 +101,13 @@ class sndfile:
         warnings.warn("sndfile class is deprecated, please use Sndfile instead",
                       DeprecationWarning)
         if format is not None and not isinstance(format, formatinfo):
-            raise ValueError("format argument must be None or " \
+            raise ValueError("format argument must be None or "
                              "formatinfo instance.")
         if format is None:
             f = None
         else:
             f = format._format
-        
+
         self._sndfile = Sndfile(filename, _COMPAT_MODES[mode], f, channels,
                                 samplerate)
 
@@ -146,7 +150,7 @@ class sndfile:
           PyaudioIOError is launched."""
         try:
             st = self._sndfile.seek(offset, whence, mode)
-        except IOError, e:
+        except IOError as e:
             raise PyaudioIOError(str(e))
         return st
 
@@ -241,15 +245,15 @@ class sndfile:
         return self._sndfile.__str__()
 
 def supported_format():
-    raise RuntimeError, \
-          "This function is broken. Please see " \
-          "audiolab.available_file_formats"
+    raise RuntimeError(
+          "This function is broken. Please see "
+          "audiolab.available_file_formats")
 
 def supported_endianness():
-    raise RuntimeError, \
-          "This function is broken - and does not even make sense."
+    raise RuntimeError(
+          "This function is broken - and does not even make sense.")
 
 def supported_encoding():
-    raise RuntimeError, \
-          "This function is broken. Please see " \
-          "audiolab.available_encodings"
+    raise RuntimeError(
+          "This function is broken. Please see "
+          "audiolab.available_encodings")

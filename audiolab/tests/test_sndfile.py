@@ -1,18 +1,22 @@
 #! /usr/bin/env python
 # Last Change: Sun Dec 14 07:00 PM 2008 J
 """Test for the sndfile class."""
-from os.path import join, dirname
+
 import os
 import sys
+
+from os.path import join, dirname
 
 from numpy.testing import TestCase, assert_array_equal, dec
 import numpy as np
 
-from audiolab import Sndfile, Format, available_encodings, available_file_formats
+from audiolab import (Sndfile, Format, available_encodings,
+    available_file_formats, sndfile_version)
 
 from testcommon import open_tmp_file, close_tmp_file, TEST_DATA_DIR
 
-_DTYPE_TO_ENC = {np.float64 : 'float64', np.float32: 'float32', 
+
+_DTYPE_TO_ENC = {np.float64 : 'float64', np.float32: 'float32',
                  np.int32: 'pcm32', np.int16: 'pcm16'}
 
 # XXX: there is a lot to refactor here
@@ -48,7 +52,7 @@ class TestSndfile(TestCase):
         finally:
             close_tmp_file(rfd, cfilename)
 
-    @dec.skipif(sys.platform=='win32', 
+    @dec.skipif(sys.platform=='win32',
                 "Not testing opening by fd because does not work on win32")
     def test_basic_io_fd(self):
         """ Check open from fd works"""
@@ -174,7 +178,7 @@ class TestSndfile(TestCase):
                 b = Sndfile(fd, 'w', format, channels=22000, samplerate=1)
                 raise AssertionError("Try to open a file with more than 256 "\
                                      "channels, this should not succeed !")
-            except ValueError, e:
+            except ValueError as e:
                 pass
 
         finally:
@@ -187,9 +191,9 @@ class TestSndfile(TestCase):
         try:
             try:
                 a.seek(2 ** 60)
-                raise Exception, \
-                      "Seek really succeded ! This should not happen"
-            except IOError, e:
+                raise Exception(
+                      "Seek really succeded ! This should not happen")
+            except IOError as e:
                 pass
         finally:
             a.close()
@@ -219,10 +223,17 @@ class TestSndfile(TestCase):
             raise AssertionError("call to non existing file should not succeed")
         except IOError:
             pass
-        except Exception, e:
+        except Exception as e:
             raise AssertionError("opening non existing file should raise" \
                                  " a IOError exception, got %s instead" %
                                  e.__class__)
+
+    def test_sndfile_version(self):
+        """ Check that sndfile_version() can parse version number correctly."""
+        ver = sndfile_version()
+        assert isinstance(ver, tuple)
+        assert len(ver) == 4
+
 
 class TestSeek(TestCase):
     def test_simple(self):
@@ -292,7 +303,7 @@ class TestSeek(TestCase):
             tbuff1 = test.read_frames(n, dtype = np.int16)
             try:
                 tbuff2 = test.read_frames(n, dtype = np.int16)
-            except IOError, e:
+            except IOError as e:
                 msg = "write pointer was updated in read seek !"
                 msg += "\n(msg is %s)" % e
                 raise AssertionError(msg)
@@ -317,7 +328,7 @@ class TestSeek(TestCase):
 
             try:
                 tbuff3 = test.read_frames(n, np.int16)
-            except IOError, e:
+            except IOError as e:
                 msg = "read pointer was updated in write seek !"
                 msg += "\n(msg is %s)" % e
                 raise AssertionError(msg)

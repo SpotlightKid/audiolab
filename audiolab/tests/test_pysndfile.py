@@ -1,10 +1,12 @@
 #! /usr/bin/env python
 # Last Change: Sun Dec 14 07:00 PM 2008 J
 """Test for the sndfile class."""
-from os.path import join, dirname
+
 import os
 import sys
 import warnings
+
+from os.path import join, dirname
 
 from numpy.testing import TestCase, assert_array_equal, dec
 import numpy as np
@@ -13,6 +15,7 @@ from audiolab import PyaudioException, PyaudioIOError
 from audiolab import sndfile, formatinfo as audio_format
 
 from testcommon import open_tmp_file, close_tmp_file, TEST_DATA_DIR
+
 
 # We filter deprecation warnings here because the features it tests will be
 # deprecated themselves
@@ -51,7 +54,7 @@ class test_pysndfile(TestCase):
         finally:
             close_tmp_file(rfd, cfilename)
 
-    @dec.skipif(sys.platform=='win32', 
+    @dec.skipif(sys.platform=='win32',
                 "Not testing opening by fd because does not work on win32")
     def test_basic_io_fd(self):
         """ Check open from fd works"""
@@ -81,7 +84,7 @@ class test_pysndfile(TestCase):
 
             # Open the copy file for writing
             format = audio_format('wav', 'float64')
-            b = sndfile(fd, 'write', format, a.get_channels(), 
+            b = sndfile(fd, 'write', format, a.get_channels(),
                     a.get_samplerate())
 
             # Copy the data in the wav file
@@ -104,7 +107,7 @@ class test_pysndfile(TestCase):
                 tmpa = a.read_frames(nbuff, dtype = np.float64)
                 tmpb = b.read_frames(nbuff, dtype = np.float64)
                 assert_array_equal(tmpa, tmpb)
-            
+
             a.close()
             b.close()
 
@@ -125,7 +128,7 @@ class test_pysndfile(TestCase):
 
             # Open the copy file for writing
             format = audio_format('wav', 'float32')
-            b = sndfile(fd, 'write', format, a.get_channels(), 
+            b = sndfile(fd, 'write', format, a.get_channels(),
                     a.get_samplerate())
 
             # Copy the data in the wav file
@@ -148,7 +151,7 @@ class test_pysndfile(TestCase):
                 tmpa = a.read_frames(nbuff, dtype = np.float32)
                 tmpb = b.read_frames(nbuff, dtype = np.float32)
                 assert_array_equal(tmpa, tmpb)
-            
+
             a.close()
             b.close()
 
@@ -159,15 +162,15 @@ class test_pysndfile(TestCase):
     def test_supported_features(self):
         for i in pysndfile.supported_format():
             msg += str(i) + ', '
-        print msg
+        print(msg)
         msg = "supported encoding format are : "
         for i in pysndfile.supported_encoding():
             msg += str(i) + ', '
-        print msg
+        print(msg)
         msg = "supported endianness are : "
         for i in pysndfile.supported_endianness():
             msg += str(i) + ', '
-        print msg
+        print(msg)
 
     def test_short_io(self):
         # TODO: check if neg or pos value is the highest in abs
@@ -192,7 +195,7 @@ class test_pysndfile(TestCase):
             b.close()
 
             assert_array_equal(a, read_a)
-            
+
         finally:
             close_tmp_file(rfd, cfilename)
 
@@ -219,13 +222,13 @@ class test_pysndfile(TestCase):
             b.close()
 
             assert_array_equal(a, read_a)
-            
+
         finally:
             close_tmp_file(rfd, cfilename)
 
     def test_mismatch(self):
         # This test open a file for writing, but with bad args (channels and
-        # nframes inverted) 
+        # nframes inverted)
         rfd, fd, cfilename = open_tmp_file('pysndfiletest.wav')
         try:
             # Open the file for writing
@@ -235,7 +238,7 @@ class test_pysndfile(TestCase):
                         format, channels = 22000, samplerate = 1)
                 raise Exception("Try to open a file with more than 256 "\
                         "channels, this should not succeed !")
-            except ValueError, e:
+            except ValueError as e:
                 #print "Gave %d channels, error detected is \"%s\"" % (22000, e)
                 pass
 
@@ -250,7 +253,7 @@ class test_pysndfile(TestCase):
             try:
                 a.seek(2 ** 60)
                 raise Exception("Seek really succeded ! This should not happen")
-            except PyaudioIOError, e:
+            except PyaudioIOError as e:
                 pass
         finally:
             a.close()
@@ -261,7 +264,7 @@ class test_pysndfile(TestCase):
         try:
             # Open the file for writing
             format = audio_format('wav', 'pcm16')
-            a = sndfile(fd, 'rwrite', format, channels = 1, 
+            a = sndfile(fd, 'rwrite', format, channels = 1,
                     samplerate = 22050)
             tmp = np.random.random_integers(-100, 100, 1000)
             tmp = tmp.astype(np.short)
@@ -281,7 +284,7 @@ class test_pysndfile(TestCase):
             raise AssertionError("call to non existing file should not succeed")
         except IOError:
             pass
-        except Exception, e:
+        except Exception as e:
             raise AssertionError("opening non existing file should raise a IOError exception, got %s instead" % e.__class__)
 
 class test_seek(TestCase):
@@ -352,16 +355,16 @@ class test_seek(TestCase):
             tbuff1 = test.read_frames(n, dtype = np.int16)
             try:
                 tbuff2 = test.read_frames(n, dtype = np.int16)
-            except IOError, e:
+            except IOError as e:
                 msg = "write pointer was updated in read seek !"
                 msg += "\n(msg is %s)" % e
-                raise AssertionError(msg) 
+                raise AssertionError(msg)
 
             assert_array_equal(rbuff1, tbuff1)
             assert_array_equal(rbuff2, tbuff2)
             if np.all(rbuff2 == tbuff1):
                 raise AssertionError("write pointer was updated"\
-                        " in read seek !") 
+                        " in read seek !")
 
             # Test seeking only write pointer
             rbuff3 = rbuff1 * 2 - 1
@@ -377,10 +380,10 @@ class test_seek(TestCase):
 
             try:
                 tbuff3 = test.read_frames(n, np.int16)
-            except IOError, e:
+            except IOError as e:
                 msg = "read pointer was updated in write seek !"
                 msg += "\n(msg is %s)" % e
-                raise AssertionError(msg) 
+                raise AssertionError(msg)
 
             assert_array_equal(tbuff3, rbuff3)
             test.close()

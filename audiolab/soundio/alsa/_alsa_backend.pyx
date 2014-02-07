@@ -31,8 +31,11 @@
 
 import numpy as np
 cimport numpy as cnp
-cimport stdlib
+
 cimport python_exc
+from cpython.version cimport PY_MAJOR_VERSION
+from libc.string cimport strlen
+
 from alsa cimport *
 
 cdef int BUFFER_TIME  = 500000
@@ -43,9 +46,6 @@ cdef extern from "alsa/asoundlib.h":
         # gccxml it seems
         int snd_pcm_hw_params_alloca(snd_pcm_hw_params_t **)
         int snd_pcm_sw_params_alloca(snd_pcm_sw_params_t **)
-
-cdef extern from "Python.h":
-        object PyString_FromStringAndSize(char *v, int len)
 
 class AlsaException(Exception):
         pass
@@ -58,7 +58,7 @@ def enumerate_devices():
         """Return list of found devices (includes user-space ones)."""
         cdef int st, card
         cdef char** hints
-        cdef char* name
+        cdef object name
 
         devices = []
         names = []
@@ -66,14 +66,25 @@ def enumerate_devices():
         card = -1
         st = snd_device_name_hint(card, "pcm", <void***>&hints)
         card = 0
+
         while(hints[card] != NULL):
                 #name = snd_device_name_get_hint(hints[card], "NAME")
                 #names.append(PyString_FromStringAndSize(name, stdlib.strlen(name)))
                 #if name != NULL:
                 #        stdlib.free(name)
-                devices.append(PyString_FromStringAndSize(hints[card], 
-                        stdlib.strlen(hints[card])))
+                st = strlen(hints[card])
+                if PY_MAJOR_VERSION >= 3:
+                    try:
+                        name = hints[card][:st].decode('utf-8', 'strict')
+                    except UnicodeDecodeError:
+                        raise RuntimeError("Error while getting device name "
+                            "for card #%i" % card)
+                else:
+                    name = hints[card][:st]
+
+                devices.append(name)
                 card += 1
+
         snd_device_name_free_hint(<void**>hints)
 
         return devices
@@ -182,7 +193,7 @@ cdef set_hw_params(snd_pcm_t *hdl, format_info info, snd_pcm_uframes_t* period_s
         if st < 0:
                 raise AlsaException("Error in _any")
 
-        # Restrict sampling rates to the ones supported by the hardware 
+        # Restrict sampling rates to the ones supported by the hardware
         st = snd_pcm_hw_params_set_rate_resample(hdl, params, 1)
         if st < 0:
                 raise AlsaException("Error in _set_rate_resample")

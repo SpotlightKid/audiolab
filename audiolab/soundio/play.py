@@ -34,6 +34,7 @@ import warnings
 
 import numpy as np
 
+
 if sys.platform[:5] == 'linux':
     BACKEND = 'ALSA'
 elif sys.platform[:6] == 'darwin':
@@ -44,7 +45,9 @@ else:
 if BACKEND == 'ALSA':
     try:
         from audiolab.soundio._alsa_backend import AlsaDevice
-    except ImportError, e:
+    except ImportError as e:
+        import traceback
+        traceback.print_exc()
         warnings.warn("Could not import alsa backend; most probably, "
                       "you did not have alsa headers when building audiolab")
 
@@ -55,16 +58,16 @@ if BACKEND == 'ALSA':
         elif input.ndim == 2:
             nc = input.shape[0]
         else:
-            raise ValueError, \
-                  "Only input of rank 1 and 2 supported for now."
+            raise ValueError(
+                  "Only input of rank 1 and 2 supported for now.")
 
         dev = AlsaDevice(fs=fs, nchannels=nc)
         dev.play(input)
 elif BACKEND == 'CoreAudio':
     try:
         from audiolab.soundio.macosx_backend import CoreAudioDevice
-    except ImportError, e:
-        print e
+    except ImportError as e:
+        print(e)
         warnings.warn("Could not import CoreAudio backend; most probably, "
                       "you did not have CoreAudio headers when building audiolab")
 
@@ -75,22 +78,22 @@ elif BACKEND == 'CoreAudio':
         elif input.ndim == 2:
             nc = input.shape[0]
         else:
-            raise ValueError, \
-                  "Only input of rank 1 and 2 supported for now."
+            raise ValueError(
+                  "Only input of rank 1 and 2 supported for now.")
 
         dev = CoreAudioDevice(fs=fs, nchannels=nc)
         dev.play(input)
 else:
     def _play(input, fs):
-        raise NotImplementedError, \
-              "No Backend implemented for your platform " \
-              "(detected platform is: %s)" % sys.platform
+        raise NotImplementedError(
+              "No Backend implemented for your platform "
+              "(detected platform is: %s)" % sys.platform)
 
 def play(input, fs=44100):
     """Play the signal in vector input to the default output device.
 
     Only floating point input are supported: input is assumed to be in the
-    range [-1.0, 1.0]. Any values outside this range will be clipped by the 
+    range [-1.0, 1.0]. Any values outside this range will be clipped by the
     device.
 
     Parameters
