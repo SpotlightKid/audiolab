@@ -33,7 +33,7 @@ import monkey_np
 from common import *
 
 
-def configuration(parent_package='',top_path=None, package_name=DISTNAME):
+def configuration(parent_package='', top_path=None, package_name=DISTNAME):
     if os.path.exists('MANIFEST'): os.remove('MANIFEST')
 
     write_info(os.path.join("audiolab", "info.py"))
